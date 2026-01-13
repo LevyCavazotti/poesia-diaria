@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poemas Anteriores</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Crimson+Text&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f1115;
+      color: #e6e1d8;
+      font-family: "Crimson Text", serif;
+      line-height: 1.7;
+    }
+
+    header {
+      padding: 40px 20px;
+      text-align: center;
+      border-bottom: 1px solid #2a2d34;
+    }
+
+    header h1 {
+      font-family: "Playfair Display", serif;
+      font-weight: 600;
+      margin: 0;
+      color: #f2ede4;
+    }
+
+    header a {
+      display: inline-block;
+      margin-top: 15px;
+      font-size: 0.9em;
+      color: #8b6f47;
+      text-decoration: none;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+
+    .poema {
+      background: #161922;
+      padding: 30px;
+      margin-bottom: 30px;
+      border-left: 3px solid #8b6f47;
+      box-shadow: 0 0 15px rgba(0,0,0,0.35);
+    }
+
+    .data {
+      font-size: 0.85em;
+      color: #9c9487;
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 0.85em;
+      color: #777064;
+      border-top: 1px solid #2a2d34;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Poemas Anteriores</h1>
+  <a href="index.html">← Voltar ao poema do dia</a>
+</header>
+
+<main id="lista-poemas"></main>
+
+<footer>
+  © 2026 Todos os direitos reservados.
+</footer>
+
+<script>
+  fetch("data/poemas.json")
+    .then(res => res.json())
+    .then(db => {
+      const textos = db.poemas.map(p => p.texto);
+
+      // 🔒 MESMA DATA DO index.html
+      const DATA_INICIO = new Date(2026, 0, 1);
+      const hoje = new Date();
+
+      const totalDias = Math.max(
+        0,
+        Math.floor((hoje - DATA_INICIO) / (1000 * 60 * 60 * 24))
+      );
+
+      function indicePoemaPorData(data, total) {
+        const seed =
+          data.getFullYear() * 10000 +
+          (data.getMonth() + 1) * 100 +
+          data.getDate();
+        return seed % total;
+      }
+
+      const container = document.getElementById("lista-poemas");
+
+      for (let i = totalDias; i >= 0; i--) {
+        const data = new Date(DATA_INICIO);
+        data.setDate(DATA_INICIO.getDate() + i);
+
+        const indice = indicePoemaPorData(data, textos.length);
+        const texto = textos[indice];
+
+        const dataFormatada = data.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        });
+
+        const div = document.createElement("div");
+        div.className = "poema";
+        div.innerHTML = `
+          <div class="data">${dataFormatada}</div>
+          <p>${texto}</p>
+        `;
+        container.appendChild(div);
+      }
+    });
+</script>
+
+</body>
+</html>
