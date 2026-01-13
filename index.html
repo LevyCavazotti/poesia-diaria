@@ -116,7 +116,7 @@
       box.innerHTML = `
         <h2>Poema do Dia</h2>
         <div class="data">${dataFormatada}</div>
-        <p>${textoHoje}</p>
+        <p>${textoHoje.replace(/\n/g, "<br>")}</p>
       `;
       main.appendChild(box);
     });
