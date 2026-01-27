@@ -1,50 +1,126 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Poesia Diária</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sua Dose Diária de Poesia</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Crimson+Text&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f1115;
+      color: #e6e1d8;
+      font-family: "Crimson Text", serif;
+      line-height: 1.7;
+    }
+
+    header {
+      padding: 40px 20px;
+      text-align: center;
+      border-bottom: 1px solid #2a2d34;
+    }
+
+    header h1 {
+      font-family: "Playfair Display", serif;
+      font-weight: 600;
+      margin: 0;
+      color: #f2ede4;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+
+    .texto-dia {
+      background: #161922;
+      padding: 40px;
+      border-left: 4px solid #8b6f47;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    .texto-dia h2 {
+      font-family: "Playfair Display", serif;
+      font-weight: 400;
+      margin-top: 0;
+      color: #d6c9b5;
+    }
+
+    .data {
+      font-size: 0.9em;
+      color: #9c9487;
+      margin-bottom: 25px;
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 0.85em;
+      color: #777064;
+      border-top: 1px solid #2a2d34;
+    }
+  </style>
 </head>
 <body>
 
-  <main>
-    <h1>Poesia diária</h1>
-    <p id="data"></p>
-    <pre id="poema"></pre>
-  </main>
+<header>
+  <h1>Sua Dose Diária de Poesia</h1>
+</header>
 
-  <script>
-    const DATA_INICIO = new Date("2024-01-01");
+<main></main>
 
-    function poemaPorData(data, poemas) {
-      const dias = Math.floor(
-        (data - DATA_INICIO) / (1000 * 60 * 60 * 24)
-      );
+<footer>
+  © 2026 Todos os direitos reservados.<br><br>
+  <a href="arquivo.html" style="color:#8b6f47; text-decoration:none;">
+    Ler poemas anteriores
+  </a>
+</footer>
 
-      const id = dias + 1;
-      return poemas.find(p => p.id === id);
-    }
+<script>
+  fetch("data/poemas.json")
+    .then(res => res.json())
+    .then(db => {
+      const textos = db.poemas.map(p => p.texto);
 
-    fetch("poemas.json")
-      .then(res => res.json())
-      .then(db => {
-        const poemas = db.poemas;
-        const hoje = new Date();
+      // 🔒 DATA ÚNICA DE INÍCIO DO PROJETO
+      const DATA_INICIO = new Date(2026, 0, 1);
 
-        const poemaHoje = poemaPorData(hoje, poemas);
-        if (!poemaHoje) return;
+      const hojeReal = new Date();
+      const hoje = hojeReal < DATA_INICIO ? DATA_INICIO : hojeReal;
 
-        document.getElementById("data").textContent =
-          hoje.toLocaleDateString("pt-BR", {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-          });
+      function indicePoemaPorData(data, total) {
+        const seed =
+          data.getFullYear() * 10000 +
+          (data.getMonth() + 1) * 100 +
+          data.getDate();
+        return seed % total;
+      }
 
-        document.getElementById("poema").textContent =
-          poemaHoje.texto;
+      const indice = indicePoemaPorData(hoje, textos.length);
+      const textoHoje = textos[indice];
+
+      const dataFormatada = hoje.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
       });
-  </script>
+
+      const main = document.querySelector("main");
+      const box = document.createElement("div");
+      box.className = "texto-dia";
+      box.innerHTML = `
+        <h2>Poema do Dia</h2>
+        <div class="data">${dataFormatada}</div>
+        <p>${textoHoje.replace(/\n/g, "<br>")}</p>
+      `;
+      main.appendChild(box);
+    });
+</script>
 
 </body>
 </html>
